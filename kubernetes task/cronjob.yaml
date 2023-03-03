@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-output
+  namespace: kubernetes
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: input
+            image: alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c", "df -T -h > cron-out.txt && mv cron-out.txt /out"]
+            volumeMounts:
+            - name: volume
+              mountPath: "/out"
+          containers:
+          - name: output
+            image: alpine
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c", "cd out/ && cat cron-out.txt"]
+            volumeMounts:
+            - name: volume
+              mountPath: "/out"
+          volumes:
+          - name: volume
+            emptyDir: {}
+          restartPolicy: OnFailure

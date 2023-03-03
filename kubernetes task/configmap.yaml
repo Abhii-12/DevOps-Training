@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configfile
+  namespace: kubernetes
+data:
+  port: "9090"
+  version: "v1"
